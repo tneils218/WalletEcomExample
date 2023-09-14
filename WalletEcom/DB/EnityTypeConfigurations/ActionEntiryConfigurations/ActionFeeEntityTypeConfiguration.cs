@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using WalletEcom.Models.Account;
 using WalletEcom.Models.Action;
 
 namespace WalletEcom.DB.EnityTypeConfigurations.ActionEntiryConfigurations
@@ -19,5 +18,5 @@ namespace WalletEcom.DB.EnityTypeConfigurations.ActionEntiryConfigurations
                .HasForeignKey("action_fee_action_type");
             builder.Property(e => e.Fee).HasColumnName("fee");
         }
-    } 
+    }
 }

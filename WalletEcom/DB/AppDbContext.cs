@@ -13,20 +13,19 @@ namespace WalletEcom.DB
         public AppDbContext()
         {
         }
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-        public DbSet<Account> Account { get; set; } = null!;
-        public DbSet<AccountType> AccountType { get; set; } = null!;
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+        {
+        }
 
-        public DbSet<ActionType> Action { get; set; } = null!;
-        public DbSet<ActionFee> ActionFee { get; set; } = null!;
-        public DbSet<Wallet> Wallet { get; set; } = null!;
+        public DbSet<Account> AccountDb { get; set; } = null!;
+        public DbSet<AccountType> AccountTypeDb { get; set; } = null!;
 
-        public DbSet<WalletHistory> WalletHistory { get; set; } = null!;
+        public DbSet<ActionType> ActionDb { get; set; } = null!;
+        public DbSet<ActionFee> ActionFeeDb { get; set; } = null!;
+        public DbSet<Wallet> WalletDb { get; set; } = null!;
 
-
-
-
+        public DbSet<WalletHistory> WalletHistoryDb { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -36,7 +35,6 @@ namespace WalletEcom.DB
             modelBuilder.ApplyConfiguration(new WalletHistoryEntityTypeConfiguration());
             modelBuilder.ApplyConfiguration(new ActionEntityTypeConfiguration());
             modelBuilder.ApplyConfiguration(new ActionFeeEntityTypeConfiguration());
-
 
             base.OnModelCreating(modelBuilder);
         }

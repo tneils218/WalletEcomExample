@@ -19,7 +19,7 @@ namespace WalletEcom.DB.EnityTypeConfigurations.AccontEntityConfigurations
 
             builder.Property(e => e.Email).
                 HasColumnName("email")
-               .HasMaxLength(50) 
+               .HasMaxLength(50)
                .IsRequired();
 
             builder.HasIndex(e => e.Email)
@@ -38,8 +38,6 @@ namespace WalletEcom.DB.EnityTypeConfigurations.AccontEntityConfigurations
             builder.HasOne(e => e.AccountType)
                .WithMany()
                .HasForeignKey("account_type_id");
-
         }
     }
 }
-    

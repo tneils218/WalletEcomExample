@@ -1,6 +1,4 @@
-﻿
-
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using WalletEcom.Models.Wallet;
 
@@ -27,8 +25,6 @@ namespace WalletEcom.DB.EnityTypeConfigurations.WalletEntityConfigurations
             builder.Property(e => e.DestinationWalletId).HasColumnName("destination_wallet_id");
             builder.Property(e => e.CreatedAt).HasColumnName("wallet_createdat");
             builder.Property(e => e.Fee).HasColumnName("wallet_fee");
-
-
         }
     }
 }

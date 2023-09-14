@@ -15,11 +15,10 @@ namespace WalletEcom.Models.Wallet
         public ActionType ActionType { get; set; } = null!;
 
         public int? SourceWalletId { get; set; }
-        public int? DestinationWalletId { get;set; }
+        public int? DestinationWalletId { get; set; }
 
         public decimal Fee { get; set; } = 0;
 
         public DateTime CreatedAt { get; set; }
-
     }
 }
