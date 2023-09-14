@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Org.BouncyCastle.Asn1.Ocsp;
+using WalletEcom.Controllers.Request;
 using WalletEcom.Services;
+using WalletEcom.Services.DTOs;
 
 namespace WalletEcom.Controllers
 {
@@ -22,12 +25,30 @@ namespace WalletEcom.Controllers
             {
                 var accounts = await _accountService.GetAccounts();
                 return Ok(accounts);
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
 
             }
-         
+
+        }
+        [HttpPost]
+        public async Task<IActionResult> CreateAccount(AccountRequest request)
+        {
+            if (!ModelState.IsValid) return ValidationProblem(ModelState);
+            try
+            {
+                var accountDto = AccountDTO.Create(request);
+                var product = await _accountService.CreateAccount(accountDto);
+                return CreatedAtAction(nameof(CreateAccount), new { id = product.Id }, product);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+
+            }
+
         }
     }
 }

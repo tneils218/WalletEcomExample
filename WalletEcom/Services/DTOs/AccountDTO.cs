@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Net.NetworkInformation;
 using System.Xml.Linq;
+using WalletEcom.Controllers.Request;
 
 namespace WalletEcom.Services.DTOs
 {
@@ -19,5 +21,9 @@ namespace WalletEcom.Services.DTOs
             Email = email;
             DOB = dob;
         }
+        public static AccountDTO Create(AccountRequest request)
+        {
+            return new AccountDTO(request.UserName, request.FullName, request.Email, request.DOB);
+        } 
     }
 }
