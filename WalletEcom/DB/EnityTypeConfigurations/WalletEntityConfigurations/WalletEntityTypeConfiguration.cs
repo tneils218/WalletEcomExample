@@ -12,9 +12,11 @@ namespace WalletEcom.DB.EnityTypeConfigurations.WalletEntityConfigurations
             builder.HasKey(e => e.Id);
             builder.Property(e => e.Amount).HasColumnName("wallet_amount");
             builder.Property(e => e.UpdatedAt).HasColumnName("wallet_updated_at");
+            builder.Property(e => e.AccountId)
+                .HasColumnName("account_id");
             builder.HasOne(e => e.Account)
                     .WithMany()
-                    .HasForeignKey("account_id");
+                    .HasForeignKey(e => e.AccountId);
         }
     }
 }

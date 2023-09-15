@@ -5,8 +5,9 @@ namespace WalletEcom.Controllers.Request
     public class AccountRequest
     {
         [Required]
+        public int AccountTypeId { get; set; }
+        [Required]
         [MaxLength(50)]
-
         public string UserName { get; set; } = null!;
         [Required]
         [MaxLength(200)]

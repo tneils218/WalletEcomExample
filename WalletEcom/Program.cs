@@ -12,6 +12,8 @@ services.AddSwaggerGen();
 
 builder.Services.AddDbContext<AppDbContext>(options => options.UseMySQL(builder.Configuration.GetConnectionString("MySql")));
 services.AddScoped<IAccountService, AccountService>();
+services.AddScoped<IWalletService, WalletService>();
+
 
 var app = builder.Build();
 

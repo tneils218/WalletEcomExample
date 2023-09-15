@@ -4,6 +4,7 @@ using Org.BouncyCastle.Asn1.Ocsp;
 using WalletEcom.Controllers.Request;
 using WalletEcom.Services;
 using WalletEcom.Services.DTOs;
+using WalletEcom.Services.DTOs.WalletEcom.Services.DTOs;
 
 namespace WalletEcom.Controllers
 {
@@ -39,9 +40,9 @@ namespace WalletEcom.Controllers
             if (!ModelState.IsValid) return ValidationProblem(ModelState);
             try
             {
-                var accountDto = AccountDTO.Create(request);
+                var accountDto = AccountDTO.Create(request.UserName, request.FullName, request.Email, request.DOB, request.AccountTypeId);
                 var product = await _accountService.CreateAccount(accountDto);
-                return CreatedAtAction(nameof(CreateAccount), new { id = product.Id }, product);
+                return CreatedAtAction(nameof(CreateAccount), new {}, product);
             }
             catch (Exception ex)
             {

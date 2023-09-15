@@ -2,6 +2,7 @@
 using WalletEcom.DB;
 using WalletEcom.Models.Account;
 using WalletEcom.Services.DTOs;
+using WalletEcom.Services.DTOs.WalletEcom.Services.DTOs;
 
 namespace WalletEcom.Services.Impls
 {
@@ -14,15 +15,21 @@ namespace WalletEcom.Services.Impls
             _db = db;
         }
 
-        public Task<Account> CreateAccount(AccountDTO account)
+        public async Task<Account> CreateAccount(AccountDTO accountDTO)
         {
-            throw new NotImplementedException();
+            var account = new Account(accountDTO.UserName, accountDTO.FullName, accountDTO.Email, accountDTO.DOB, accountDTO.AccountTypeId);
+    
+            _db.AccountDb.Add(account);
+            await _db.SaveChangesAsync();
+            return account;
         }
+
+      
 
         public async Task<List<Account>> GetAccounts()
         {
-            var accounts = await _db.AccountDb.ToListAsync();
-            return accounts;
+            var accounts = await _db.AccountDb.Include(a => a.AccountType).ToListAsync();
+            return accounts;    
         }
     }
 }

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WalletEcom.DB;
 
@@ -10,9 +11,10 @@ using WalletEcom.DB;
 namespace WalletEcom.DB.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230915033554_AddActivatedAtToAccount")]
+    partial class AddActivatedAtToAccount
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -157,10 +159,6 @@ namespace WalletEcom.DB.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("AccountId")
-                        .HasColumnType("int")
-                        .HasColumnName("account_id");
-
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("wallet_amount");
@@ -169,9 +167,12 @@ namespace WalletEcom.DB.Migrations
                         .HasColumnType("datetime(6)")
                         .HasColumnName("wallet_updated_at");
 
+                    b.Property<int>("account_id")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("AccountId");
+                    b.HasIndex("account_id");
 
                     b.ToTable("tbl_wallet", (string)null);
                 });
@@ -256,7 +257,7 @@ namespace WalletEcom.DB.Migrations
                 {
                     b.HasOne("WalletEcom.Models.Account.Account", "Account")
                         .WithMany()
-                        .HasForeignKey("AccountId")
+                        .HasForeignKey("account_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

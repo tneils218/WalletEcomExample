@@ -33,11 +33,17 @@ namespace WalletEcom.DB.EnityTypeConfigurations.AccontEntityConfigurations
             builder.Property(e => e.CreatedAt)
              .HasColumnName("created_at");
 
+            builder.Property(e => e.AccountTypeId)
+                .HasColumnName("account_type_id");
+
+            builder.Property(e => e.ActivatedAt)
+                .HasColumnName("activated_at");
+
             builder.Property(e => e.Status).HasColumnName("status");
 
             builder.HasOne(e => e.AccountType)
                .WithMany()
-               .HasForeignKey("account_type_id");
+               .HasForeignKey(e => e.AccountTypeId);
         }
     }
 }

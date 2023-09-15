@@ -6,7 +6,13 @@
         public decimal Amount { get; set; }
 
         public DateTime UpdatedAt { get; set; }
+        public int AccountId { get; set; }
+        public Account.Account? Account { get; set; }
 
-        public Account.Account Account { get; set; } = null!;
+        public Wallet(int accountId)
+        {
+            UpdatedAt = DateTime.Now;
+            AccountId = accountId;
+        }
     }
 }
