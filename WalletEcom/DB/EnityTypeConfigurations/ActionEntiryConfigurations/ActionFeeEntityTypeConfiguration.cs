@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using WalletEcom.Models.Account;
 using WalletEcom.Models.Action;
 
 namespace WalletEcom.DB.EnityTypeConfigurations.ActionEntiryConfigurations
@@ -24,6 +23,7 @@ namespace WalletEcom.DB.EnityTypeConfigurations.ActionEntiryConfigurations
             builder.Property(e => e.Fee).HasColumnName("fee");
             builder.HasData(CreateActionFee());
         }
+
         private ActionFee[] CreateActionFee()
         {
             return new ActionFee[]
@@ -33,19 +33,14 @@ namespace WalletEcom.DB.EnityTypeConfigurations.ActionEntiryConfigurations
                    new ActionFee(id: 3, accountTypeId: 3, actionTypeId: 1, fee: 0),
                    new ActionFee(id: 4, accountTypeId: 1, actionTypeId: 2, fee: 30),
                    new ActionFee(id: 5, accountTypeId:2, actionTypeId: 2, fee: 20),
-                    new ActionFee(id: 6, accountTypeId:3, actionTypeId: 2, fee: 0),
+                   new ActionFee(id: 6, accountTypeId:3, actionTypeId: 2, fee: 1),
+                   new ActionFee(id: 7, accountTypeId: 1, actionTypeId: 3, fee: 25),
+                   new ActionFee(id: 8, accountTypeId:2, actionTypeId: 3, fee: 15),
+                   new ActionFee(id: 9, accountTypeId:3, actionTypeId: 3, fee: 5),
+                   new ActionFee(id: 10, accountTypeId: 1, actionTypeId: 4, fee: 0),
+                   new ActionFee(id: 11, accountTypeId:2, actionTypeId: 4, fee: 0),
+                   new ActionFee(id: 12, accountTypeId:3, actionTypeId: 4, fee: 0),
             };
         }
-
-        //private ActionType[] CreateActionType()
-        //{
-        //    return new ActionType[]
-        //    {
-        //           new ActionType(1, "Add money"),
-        //           new ActionType(2, "Transfer money"),
-        //           new ActionType(3, "Withdraw money"),
-        //           new ActionType(4, "Receive money"),
-        //    };
-
-       }
     }
+}
