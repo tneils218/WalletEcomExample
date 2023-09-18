@@ -73,7 +73,7 @@ namespace WalletEcom.Services.Impls
                 sender.Amount -= transferRequest.amount + transferFee.Fee;
                 receiver.Amount += transferRequest.amount;
 
-                var walletTransferHistory = WalletHistory.CreateForSender(sender.Id,  receiver.Id, transferFee.Fee, sender.Account.AccountTypeId, 2, transferRequest.amount);
+                var walletTransferHistory = WalletHistory.CreateForSender(sender.Id, receiver.Id, transferFee.Fee, sender.Account.AccountTypeId, 2, transferRequest.amount);
 
                 _db.WalletHistoryDb.Add(walletTransferHistory);
 
