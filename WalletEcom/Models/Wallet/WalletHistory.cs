@@ -10,9 +10,13 @@ namespace WalletEcom.Models.Wallet
 
         public decimal Amount { get; set; }
 
-        public AccountType AccountType { get; set; } = null!;
+        public AccountType? AccountType { get; set; } = null!;
 
-        public ActionType ActionType { get; set; } = null!;
+        public ActionType? ActionType { get; set; } = null!;
+
+        public int AccountTypeId { get; set; }
+
+        public int ActionTypeId { get; set; }
 
         public int? SourceWalletId { get; set; }
         public int? DestinationWalletId { get; set; }
@@ -20,5 +24,16 @@ namespace WalletEcom.Models.Wallet
         public decimal Fee { get; set; } = 0;
 
         public DateTime CreatedAt { get; set; }
+
+        public WalletHistory() { }
+        public WalletHistory(int senderWalletId, int receiverWalletId, decimal fee, int accountTypeId, int actionTypeId, decimal amount) {
+            SourceWalletId = senderWalletId;
+            DestinationWalletId = receiverWalletId;
+            Fee = fee;
+            AccountTypeId = accountTypeId;
+            ActionTypeId = actionTypeId;
+            Amount = amount;
+            CreatedAt = DateTime.Now;
+        }
     }
 }
