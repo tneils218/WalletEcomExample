@@ -6,7 +6,8 @@ namespace WalletEcom.Models.Wallet
     public class WalletHistory
     {
         public int Id { get; set; }
-        public Wallet Wallet { get; set; } = null!;
+        public Wallet? Wallet { get; set; }
+        public int WalletId { get; set; }
 
         public decimal Amount { get; set; }
 
@@ -26,13 +27,14 @@ namespace WalletEcom.Models.Wallet
         public DateTime CreatedAt { get; set; }
 
         public WalletHistory() { }
-        public WalletHistory(int senderWalletId, int receiverWalletId, decimal fee, int accountTypeId, int actionTypeId, decimal amount) {
+        public WalletHistory(int walletId, int senderWalletId, int receiverWalletId, decimal fee, int accountTypeId, int actionTypeId, decimal amount) {
             SourceWalletId = senderWalletId;
             DestinationWalletId = receiverWalletId;
             Fee = fee;
             AccountTypeId = accountTypeId;
             ActionTypeId = actionTypeId;
             Amount = amount;
+            WalletId = walletId;
             CreatedAt = DateTime.Now;
         }
     }

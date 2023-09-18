@@ -40,7 +40,6 @@ namespace WalletEcom.Services.Impls
             var wallets = await query.ToListAsync();
             return wallets;
         }
-
         public async Task<string> TransferWallet(WalletTransferRequest transferRequest)
         {
             using var transaction = await _db.Database.BeginTransactionAsync();
@@ -48,51 +47,56 @@ namespace WalletEcom.Services.Impls
             var sender = await _db.WalletDb.Include(o => o.Account)
                 .FirstOrDefaultAsync(o => o.AccountId == transferRequest.senderId && o.Id == transferRequest.senderWalletId);
 
-            var actionType = 2;
             var receiver = await _db.WalletDb.Include(o => o.Account)
                 .FirstOrDefaultAsync(o => o.AccountId == transferRequest.receiverId && o.Id == transferRequest.receiverWalletId);
-
-
-
-            var transferFee = await _db.ActionFeeDb.FirstOrDefaultAsync(o => o.AccountTypeId == sender.Account.AccountTypeId && o.ActionTypeId == 2);
-
-
 
             if (sender == null || receiver == null)
             {
                 throw new ArgumentException("Invalid sender or receiver wallet ID.");
             }
 
-            
+            var transferFee = await _db.ActionFeeDb
+                .FirstOrDefaultAsync(o => o.AccountTypeId == sender.Account.AccountTypeId && o.ActionTypeId == 2);
+
+            if (transferFee == null)
+            {
+                throw new InvalidOperationException("Transfer fee not available for the given account type.");
+            }
+
             if (sender.Amount < transferRequest.amount)
             {
                 throw new InvalidOperationException("Insufficient balance in the sender's wallet.");
             }
-            if (transferRequest.senderWalletId == transferRequest.receiverWalletId && transferRequest.senderId == transferRequest.receiverId )
+
+            if (transferRequest.senderWalletId == transferRequest.receiverWalletId && transferRequest.senderId == transferRequest.receiverId)
             {
                 throw new InvalidOperationException("Không thể chuyển cùng ví");
             }
 
-
             try
             {
-
                 sender.Amount -= transferRequest.amount + transferFee.Fee;
                 receiver.Amount += transferRequest.amount;
-                //var walletHistory = new WalletHistory(sender.Id, receiver.Id, transferRequest.fee, transferRequest.accountTypeId, transferRequest.actionTypeId, transferRequest.amount);
-                //_db.WalletHistoryDb.Add(walletHistory);
+
+                var walletTransferHistory = new WalletHistory(transferRequest.senderWalletId, 0 , receiver.Id, transferFee.Fee, sender.Account.AccountTypeId, 2, transferRequest.amount);
+                var walletReceiverHistory = new WalletHistory(transferRequest.receiverWalletId, sender.Id, 0, transferFee.Fee, receiver.Account.AccountTypeId, 4, transferRequest.amount);
+
+                _db.WalletHistoryDb.Add(walletTransferHistory);
+                _db.WalletHistoryDb.Add(walletReceiverHistory);
+
                 await _db.SaveChangesAsync();
                 await transaction.CommitAsync();
-            return "Chuyển khoản thành công";
 
+                return "Chuyển khoản thành công";
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
                 await transaction.RollbackAsync();
+                Console.WriteLine("Inner Exception: " + ex.InnerException?.Message);
                 throw;
             }
         }
+
 
 
         public async Task<Wallet> UpdateWallet(string id, decimal newAmount)

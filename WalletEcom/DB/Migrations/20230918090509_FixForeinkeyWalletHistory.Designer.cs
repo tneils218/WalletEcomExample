@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WalletEcom.DB;
 
@@ -10,9 +11,10 @@ using WalletEcom.DB;
 namespace WalletEcom.DB.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230918090509_FixForeinkeyWalletHistory")]
+    partial class FixForeinkeyWalletHistory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -320,7 +322,7 @@ namespace WalletEcom.DB.Migrations
                         .HasColumnType("int")
                         .HasColumnName("source_wallet_id");
 
-                    b.Property<int>("WalletId")
+                    b.Property<int>("wallet_id")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -329,7 +331,7 @@ namespace WalletEcom.DB.Migrations
 
                     b.HasIndex("ActionTypeId");
 
-                    b.HasIndex("WalletId");
+                    b.HasIndex("wallet_id");
 
                     b.ToTable("tbl_wallet_history", (string)null);
                 });
@@ -391,7 +393,7 @@ namespace WalletEcom.DB.Migrations
 
                     b.HasOne("WalletEcom.Models.Wallet.Wallet", "Wallet")
                         .WithMany()
-                        .HasForeignKey("WalletId")
+                        .HasForeignKey("wallet_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

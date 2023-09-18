@@ -10,7 +10,7 @@ namespace WalletEcom.DB.EnityTypeConfigurations.ActionEntiryConfigurations
         {
             builder.ToTable("tbl_action_fee");
             builder.HasKey(e => e.Id);
-            builder.Property(e => e.AccountTypeId)
+            builder.Property(e => e.AccountTypeId)  
               .HasColumnName("action_fee_account_type");
             builder.HasOne(e => e.AccountType)
                 .WithMany()
