@@ -5,8 +5,8 @@ namespace WalletEcom.Models.Action
     public class ActionFee
     {
         public int Id { get; set; }
-        
-        public int AccountTypeId { get; set; }  
+
+        public int AccountTypeId { get; set; }
 
         public int ActionTypeId { get; set; }
 
@@ -23,5 +23,5 @@ namespace WalletEcom.Models.Action
             Fee = fee;
         }
     }
-    
+
 }

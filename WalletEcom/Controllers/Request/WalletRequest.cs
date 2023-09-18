@@ -6,6 +6,6 @@ namespace WalletEcom.Controllers.Request
 
     {
         [Required]
-        public int AccountId { get; set; } 
+        public int AccountId { get; set; }
     }
 }

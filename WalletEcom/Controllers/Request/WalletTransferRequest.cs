@@ -7,7 +7,7 @@ namespace WalletEcom.Controllers.Request
         [Required]
         public int senderId { get; set; }
         [Required]
-        public int senderWalletId { get; set; } 
+        public int senderWalletId { get; set; }
 
         [Required]
         public int receiverId { get; set; }

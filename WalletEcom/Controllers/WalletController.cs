@@ -1,10 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using WalletEcom.Controllers.Request;
 using WalletEcom.Services;
 using WalletEcom.Services.DTOs;
-using WalletEcom.Services.DTOs.WalletEcom.Services.DTOs;
-using WalletEcom.Services.Impls;
 
 namespace WalletEcom.Controllers
 {
@@ -33,7 +30,7 @@ namespace WalletEcom.Controllers
             try
             {
                 var walletDto = WalletDTO.Create(request.AccountId);
-                var wallets = await _walletService.CreateWallet( walletDto);
+                var wallets = await _walletService.CreateWallet(walletDto);
                 return CreatedAtAction(nameof(CreateWallet), new { }, wallets);
             }
             catch (Exception ex)
@@ -52,7 +49,7 @@ namespace WalletEcom.Controllers
             {
 
                 var wallets = await _walletService.TransferWallet(request);
-                return Ok(wallets); 
+                return Ok(wallets);
             }
             catch (Exception ex)
             {
@@ -65,7 +62,7 @@ namespace WalletEcom.Controllers
         public async Task<IActionResult> UpdateAmount(string id, [FromBody] WalletAmountRequest request)
         {
             if (!ModelState.IsValid) return ValidationProblem(ModelState);
-            
+
             try
             {
 

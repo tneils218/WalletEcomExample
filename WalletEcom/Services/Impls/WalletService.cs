@@ -1,17 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 using WalletEcom.Controllers.Request;
 using WalletEcom.DB;
-using WalletEcom.Models.Account;
 using WalletEcom.Models.Wallet;
 using WalletEcom.Services.DTOs;
-using WalletEcom.Services.DTOs.WalletEcom.Services.DTOs;
-using ZstdSharp;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace WalletEcom.Services.Impls
 {
-    public class WalletService: IWalletService
+    public class WalletService : IWalletService
     {
         private readonly AppDbContext _db;
 
@@ -34,7 +29,7 @@ namespace WalletEcom.Services.Impls
             IQueryable<Wallet> query = _db.WalletDb.Include(o => o.Account); ;
             if (!string.IsNullOrEmpty(id))
             {
-              query = query.Where(o => o.AccountId == int.Parse(id));
+                query = query.Where(o => o.AccountId == int.Parse(id));
             }
 
             var wallets = await query.ToListAsync();
@@ -78,8 +73,8 @@ namespace WalletEcom.Services.Impls
                 sender.Amount -= transferRequest.amount + transferFee.Fee;
                 receiver.Amount += transferRequest.amount;
 
-                var walletTransferHistory = new WalletHistory(transferRequest.senderWalletId, 0 , receiver.Id, transferFee.Fee, sender.Account.AccountTypeId, 2, transferRequest.amount);
-                var walletReceiverHistory = new WalletHistory(transferRequest.receiverWalletId, sender.Id, 0, transferFee.Fee, receiver.Account.AccountTypeId, 4, transferRequest.amount);
+                var walletTransferHistory = new WalletHistory(sender.Id, 0, receiver.Id, transferFee.Fee, sender.Account.AccountTypeId, 2, transferRequest.amount);
+                var walletReceiverHistory = new WalletHistory(receiver.Id, sender.Id, 0, transferFee.Fee, receiver.Account.AccountTypeId, 4, transferRequest.amount);
 
                 _db.WalletHistoryDb.Add(walletTransferHistory);
                 _db.WalletHistoryDb.Add(walletReceiverHistory);
@@ -112,10 +107,10 @@ namespace WalletEcom.Services.Impls
 
                 if (wallet != null)
                 {
-                
+
                     wallet.Amount += newAmount;
 
-            
+
                     await _db.SaveChangesAsync();
 
                     return wallet;

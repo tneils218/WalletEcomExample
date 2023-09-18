@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using WalletEcom.Models.Account;
 using WalletEcom.Models.Action;
 
 namespace WalletEcom.DB.EnityTypeConfigurations.ActionEntiryConfigurations

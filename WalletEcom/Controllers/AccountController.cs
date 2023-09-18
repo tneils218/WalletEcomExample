@@ -1,9 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Org.BouncyCastle.Asn1.Ocsp;
+﻿using Microsoft.AspNetCore.Mvc;
 using WalletEcom.Controllers.Request;
 using WalletEcom.Services;
-using WalletEcom.Services.DTOs;
 using WalletEcom.Services.DTOs.WalletEcom.Services.DTOs;
 
 namespace WalletEcom.Controllers
@@ -42,7 +39,7 @@ namespace WalletEcom.Controllers
             {
                 var accountDto = AccountDTO.Create(request.UserName, request.FullName, request.Email, request.DOB, request.AccountTypeId);
                 var product = await _accountService.CreateAccount(accountDto);
-                return CreatedAtAction(nameof(CreateAccount), new {}, product);
+                return CreatedAtAction(nameof(CreateAccount), new { }, product);
             }
             catch (Exception ex)
             {

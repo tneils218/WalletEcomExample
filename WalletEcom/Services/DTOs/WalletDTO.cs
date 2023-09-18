@@ -1,6 +1,4 @@
-﻿using WalletEcom.Services.DTOs.WalletEcom.Services.DTOs;
-
-namespace WalletEcom.Services.DTOs
+﻿namespace WalletEcom.Services.DTOs
 {
     public class WalletDTO
     {
@@ -11,7 +9,7 @@ namespace WalletEcom.Services.DTOs
         {
             AccountId = accountId;
         }
-      
+
         public static WalletDTO Create(int accountId)
         {
             return new WalletDTO(accountId);

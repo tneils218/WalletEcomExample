@@ -12,14 +12,14 @@ namespace WalletEcom.Controllers.Request
         [Required]
         [MaxLength(200)]
         public string FullName { get; set; } = null!;
-        
+
         [Required]
         [MaxLength(200)]
         [EmailAddress]
         public string Email { get; set; } = null!;
-        
-        
+
+
         [Required]
-        public DateTime DOB { get; set; } 
+        public DateTime DOB { get; set; }
     }
 }

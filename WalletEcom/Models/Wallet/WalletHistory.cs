@@ -27,7 +27,8 @@ namespace WalletEcom.Models.Wallet
         public DateTime CreatedAt { get; set; }
 
         public WalletHistory() { }
-        public WalletHistory(int walletId, int senderWalletId, int receiverWalletId, decimal fee, int accountTypeId, int actionTypeId, decimal amount) {
+        public WalletHistory(int walletId, int senderWalletId, int receiverWalletId, decimal fee, int accountTypeId, int actionTypeId, decimal amount)
+        {
             SourceWalletId = senderWalletId;
             DestinationWalletId = receiverWalletId;
             Fee = fee;

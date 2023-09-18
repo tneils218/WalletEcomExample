@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace WalletEcom.Models.Account
+﻿namespace WalletEcom.Models.Account
 {
     public class Account
     {
