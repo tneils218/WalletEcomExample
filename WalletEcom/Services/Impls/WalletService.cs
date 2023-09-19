@@ -43,7 +43,7 @@ namespace WalletEcom.Services.Impls
                 return wallets;
             }
         }
-        public async Task<string> TransferWallet(int? sourceId, int walletId, decimal amount, int? destinationId, int? destinationWalletId, int actionTypeId)
+        public async Task<string> TransferWallet(int sourceId, int walletId, decimal amount, int? destinationId, int? destinationWalletId, int actionTypeId)
         {
             using (var dbContext = dbContextContextFactory.CreateDbContext())
             {

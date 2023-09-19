@@ -7,29 +7,20 @@
         public decimal Amount { get; set; }
         public int? DestinationId { get; set; }
         public int? DestinationWalletID { get; set; }
-        public int? SourceId { get; set; }
+        public int SourceId { get; set; }
 
-        private WalletQueueDataDTO(int actionID, int walletId, decimal amount, int sourceId, int destinationId, int destinationWalletID)
+        private WalletQueueDataDTO(int actionID, int walletId, decimal amount, int sourceId, int? destinationId, int? destinationWalletID)
         {
             ActionId = actionID;
             WalletId = walletId;
             Amount = amount;
-            DestinationId = destinationId;
+            DestinationId = destinationId ?? 0;
             SourceId = sourceId;
-            DestinationWalletID = destinationWalletID;
+            DestinationWalletID = destinationWalletID ?? 0;
         }
 
-        private WalletQueueDataDTO(int actionID, int walletId, decimal amount)
-            : this(actionID, walletId, amount, 0, 0, 0)
-        {
-        }
 
-        //public static WalletQueueDataDTO CreateForAddMoney(int actionID, int walletId, decimal amount)
-        //{
-        //    return new WalletQueueDataDTO(actionID, walletId, amount);
-        //}
-
-        public static WalletQueueDataDTO Create(int actionID, int walletId, decimal amount, int sourceId, int destinationId, int destinationWalletId)
+        public static WalletQueueDataDTO Create(int actionID, int walletId, decimal amount, int sourceId, int? destinationId, int? destinationWalletId)
         {
             return new WalletQueueDataDTO(actionID, walletId, amount, sourceId, destinationId, destinationWalletId);
         }

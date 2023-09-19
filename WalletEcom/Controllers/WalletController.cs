@@ -53,28 +53,6 @@ namespace WalletEcom.Controllers
                 await _walletQueueService.Queue(WalletQueueDataDTO.Create(
                             request.actionTypeId, walletId, request.amount, id, request.receiverId, request.receiverWalletId));
                 return Ok();
-
-                //switch (request.actionTypeId)
-                //{
-                //    case 1:
-                //    case 4:
-
-                //        await _walletQueueService.Queue(WalletQueueDataDTO.CreateForAddMoney(request.actionTypeId, walletId, request.amount));
-                //        return Ok("Nạp tiền thành công");
-                //    case 2:
-
-                //        await _walletQueueService.Queue(WalletQueueDataDTO.CreateForTransfer(
-                //            request.actionTypeId, walletId, request.amount, id, request.receiverId, request.receiverWalletId));
-
-                //        return Ok("Chuyển tiền thành công");
-
-                //    //case 3:
-                //    //    var receiveResult = await _walletService.ReceiveMoney(id, walletId, request.receiverId, request.receiverWalletId, request.amount);
-                //    //    return Ok(receiveResult);
-
-                //    default:
-                //        return BadRequest("Invalid actionTypeId.");
-                //}
             }
             catch (Exception ex)
             {
