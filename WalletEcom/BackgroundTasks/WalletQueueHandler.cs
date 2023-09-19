@@ -23,9 +23,10 @@ namespace WalletEcom.BackgroundTasks
                 {
                     case 1:
                     case 4:
-
                         await _walletService.UpdateWallet(data.WalletId, data.Amount, data.ActionId);
+                        break;
 
+                    case 3:
                         break;
                     default:
                         await _walletService.TransferWallet(data.SourceId, data.WalletId, data.Amount, data.DestinationId, data.DestinationWalletID, data.ActionId);
