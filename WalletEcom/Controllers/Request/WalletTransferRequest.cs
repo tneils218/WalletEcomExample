@@ -5,6 +5,7 @@ namespace WalletEcom.Controllers.Request
     public class WalletTransferRequest
     {
 
+
         public int receiverId { get; set; }
 
 

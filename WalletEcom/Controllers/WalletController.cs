@@ -59,7 +59,42 @@ namespace WalletEcom.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+        [HttpPost]
+        [Route("add")]
+        public async Task<IActionResult> AddMoney([FromBody] WalletAddOrWithdrawMoneyRequest request)
+        {
+            if (!ModelState.IsValid)
+                return ValidationProblem(ModelState);
 
+            try
+            {
+                await _walletQueueService.Queue(WalletQueueDataDTO.CreateForAdd(
+                            request.WalletId, request.Amount, request.ActionTypeId));
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+        [HttpPost]
+        [Route("withdraw")]
+        public async Task<IActionResult> WithdrawMoney([FromBody] WalletAddOrWithdrawMoneyRequest request)
+        {
+            if (!ModelState.IsValid)
+                return ValidationProblem(ModelState);
+
+            try
+            {
+                await _walletQueueService.Queue(WalletQueueDataDTO.CreateForAdd(
+                            request.WalletId, request.Amount, request.ActionTypeId));
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
 
     }
 }
