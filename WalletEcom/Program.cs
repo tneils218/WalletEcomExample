@@ -18,8 +18,8 @@ services.AddSingleton<IWalletQueueService>(sp =>
 {
     return new InMemoryWalletQueueService(128);
 });
-services.AddScoped<IAccountService, AccountService>();
 services.AddSingleton<IWalletService, WalletService>();
+services.AddScoped<IAccountService, AccountService>();
 
 
 var app = builder.Build();

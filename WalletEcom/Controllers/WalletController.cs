@@ -55,17 +55,15 @@ namespace WalletEcom.Controllers
                 {
                     case 1:
                     case 4:
-                        await _walletQueueService.Queue(new WalletQueueDataDTO
-                        {
-                            ActionId = request.actionTypeId,
-                            Amount = request.amount,
-                            WalletId = walletId
-                        });
-                        return Ok();
+
+                        await _walletQueueService.Queue(WalletQueueDataDTO.CreateForAddMoney(request.actionTypeId, walletId, request.amount));
+                        return Ok("Nạp tiền thành công");
                     case 2:
 
-                        var transferResult = await _walletService.TransferWallet(id, walletId, request);
-                        return Ok(transferResult);
+                        await _walletQueueService.Queue(WalletQueueDataDTO.CreateForTransfer(
+                            request.actionTypeId, walletId, request.amount, id, request.receiverId, request.receiverWalletId));
+
+                        return Ok("Chuyển tiền thành công");
 
                     //case 3:
                     //    var receiveResult = await _walletService.ReceiveMoney(id, walletId, request.receiverId, request.receiverWalletId, request.amount);

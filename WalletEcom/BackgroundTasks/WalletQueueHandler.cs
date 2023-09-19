@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using WalletEcom.Services;
+﻿using WalletEcom.Services;
 
 namespace WalletEcom.BackgroundTasks
 {
@@ -20,8 +19,10 @@ namespace WalletEcom.BackgroundTasks
             while (!stoppingToken.IsCancellationRequested)
             {
                 var data = await _queueService.Dequeue();
-                _logger.LogInformation(JsonSerializer.Serialize(data));
+                await _walletService.UpdateWallet(data.WalletId, data.Amount, data.ActionId);
+                await _walletService.TransferWallet(data.SourceId, data.WalletId, data.Amount, data.DestinationId, data.DestinationWalletID, data.ActionId);
             }
+
         }
     }
 }

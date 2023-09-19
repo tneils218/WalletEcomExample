@@ -5,10 +5,10 @@ namespace WalletEcom.Controllers.Request
     public class WalletTransferRequest
     {
 
-        public int? receiverId { get; set; }
+        public int receiverId { get; set; }
 
 
-        public int? receiverWalletId { get; set; }
+        public int receiverWalletId { get; set; }
 
         [Required]
         public int actionTypeId { get; set; }

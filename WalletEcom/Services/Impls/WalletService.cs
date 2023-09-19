@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using WalletEcom.Controllers.Request;
 using WalletEcom.DB;
 using WalletEcom.Models.Wallet;
 using WalletEcom.Services.DTOs;
@@ -15,6 +14,7 @@ namespace WalletEcom.Services.Impls
         {
             dbContextContextFactory = dbContextFactory;
             _logger = logger;
+
         }
         public async Task<Wallet> CreateWallet(WalletDTO walletDTO)
         {
@@ -43,11 +43,11 @@ namespace WalletEcom.Services.Impls
                 return wallets;
             }
         }
-        public async Task<string> TransferWallet(int id, int walletId, WalletTransferRequest transferRequest)
+        public async Task<string> TransferWallet(int sourceId, int walletId, decimal amount, int destinationId, int destinationWalletId, int actionTypeId)
         {
             using (var dbContext = dbContextContextFactory.CreateDbContext())
             {
-                if (walletId == transferRequest.receiverWalletId && id == transferRequest.receiverId)
+                if (walletId == destinationWalletId && sourceId == destinationId)
                 {
                     throw new InvalidOperationException("Không thể chuyển cùng ví");
                 }
@@ -55,10 +55,10 @@ namespace WalletEcom.Services.Impls
                 using var transaction = await dbContext.Database.BeginTransactionAsync();
 
                 var sender = await dbContext.WalletDb.Include(o => o.Account)
-                    .FirstOrDefaultAsync(o => o.AccountId == id && o.Id == walletId);
+                    .FirstOrDefaultAsync(o => o.AccountId == sourceId && o.Id == walletId);
 
                 var receiver = await dbContext.WalletDb.Include(o => o.Account)
-                    .FirstOrDefaultAsync(o => o.AccountId == transferRequest.receiverId && o.Id == transferRequest.receiverWalletId);
+                    .FirstOrDefaultAsync(o => o.AccountId == destinationId && o.Id == destinationWalletId);
 
                 if (sender == null || receiver == null)
                 {
@@ -66,14 +66,14 @@ namespace WalletEcom.Services.Impls
                 }
 
                 var transferFee = await dbContext.ActionFeeDb
-                    .FirstOrDefaultAsync(o => o.AccountTypeId == sender.Account.AccountTypeId && o.ActionTypeId == transferRequest.actionTypeId);
+                    .FirstOrDefaultAsync(o => o.AccountTypeId == sender.Account.AccountTypeId && o.ActionTypeId == actionTypeId);
 
                 if (transferFee == null)
                 {
                     throw new InvalidOperationException("Transfer fee not available for the given account type.");
                 }
 
-                if (sender.Amount < transferRequest.amount)
+                if (sender.Amount < amount)
                 {
                     throw new InvalidOperationException("Insufficient balance in the sender's wallet.");
                 }
@@ -82,10 +82,10 @@ namespace WalletEcom.Services.Impls
 
                 try
                 {
-                    sender.Amount -= transferRequest.amount + transferFee.Fee;
-                    receiver.Amount += transferRequest.amount;
+                    sender.Amount -= amount + transferFee.Fee;
+                    receiver.Amount += amount;
 
-                    var walletTransferHistory = WalletHistory.CreateForSender(sender.Id, receiver.Id, transferFee.Fee, sender.Account.AccountTypeId, transferRequest.actionTypeId, transferRequest.amount);
+                    var walletTransferHistory = WalletHistory.CreateForSender(sender.Id, receiver.Id, transferFee.Fee, sender.Account.AccountTypeId, actionTypeId, amount);
 
                     dbContext.WalletHistoryDb.Add(walletTransferHistory);
 
@@ -105,13 +105,14 @@ namespace WalletEcom.Services.Impls
 
 
 
-        public async Task<Wallet> UpdateWallet(int id, int walletId, decimal amount, int actionTypeId)
+        public async Task<Wallet> UpdateWallet(int walletId, decimal amount, int actionTypeId)
         {
+
             using (var dbContext = dbContextContextFactory.CreateDbContext())
             {
                 try
                 {
-                    var wallet = await dbContext.WalletDb.FirstOrDefaultAsync(o => o.AccountId == id && o.Id == walletId);
+                    var wallet = await dbContext.WalletDb.FirstOrDefaultAsync(o => o.Id == walletId);
 
                     if (wallet != null)
                     {
@@ -138,6 +139,7 @@ namespace WalletEcom.Services.Impls
                 {
                     throw new Exception("Error updating wallet.", ex); // Custom exception for other errors
                 }
+                return null;
             }
         }
     }
