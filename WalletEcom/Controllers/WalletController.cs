@@ -10,16 +10,18 @@ namespace WalletEcom.Controllers
     public class WalletController : ControllerBase
     {
         private readonly IWalletService _walletService;
+        private readonly IWalletQueueService _walletQueueService;
 
-        public WalletController(IWalletService walletService)
+        public WalletController(IWalletService walletService, IWalletQueueService walletQueueService)
         {
             _walletService = walletService;
+            _walletQueueService = walletQueueService;
 
         }
         [HttpGet]
         public async Task<IActionResult> getAllWallet([FromQuery] string? id = "")
         {
-            var wallelts = await _walletService.GetAllWallet(id);
+            var wallelts = await _walletService.GetAllWallet(id ?? "");
             return Ok(wallelts);
         }
 
@@ -41,7 +43,6 @@ namespace WalletEcom.Controllers
 
         }
         [HttpPut("{id}")]
-        [Route("tranfer")]
         public async Task<IActionResult> TransferWallet(int id, int walletId, WalletTransferRequest request)
         {
             if (!ModelState.IsValid)
@@ -53,8 +54,14 @@ namespace WalletEcom.Controllers
                 switch (request.actionTypeId)
                 {
                     case 1:
-                        var wallets = await _walletService.UpdateWallet(id, walletId, request.amount, request.actionTypeId);
-                        return Ok(wallets);
+                    case 4:
+                        await _walletQueueService.Queue(new WalletQueueDataDTO
+                        {
+                            ActionId = request.actionTypeId,
+                            Amount = request.amount,
+                            WalletId = walletId
+                        });
+                        return Ok();
                     case 2:
 
                         var transferResult = await _walletService.TransferWallet(id, walletId, request);
@@ -63,9 +70,7 @@ namespace WalletEcom.Controllers
                     //case 3:
                     //    var receiveResult = await _walletService.ReceiveMoney(id, walletId, request.receiverId, request.receiverWalletId, request.amount);
                     //    return Ok(receiveResult);
-                    case 4:
-                        var withdrawResult = await _walletService.UpdateWallet(id, walletId, request.amount, request.actionTypeId);
-                        return Ok(withdrawResult);
+
                     default:
                         return BadRequest("Invalid actionTypeId.");
                 }
