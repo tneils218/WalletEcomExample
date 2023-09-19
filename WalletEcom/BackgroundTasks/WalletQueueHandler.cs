@@ -19,8 +19,19 @@ namespace WalletEcom.BackgroundTasks
             while (!stoppingToken.IsCancellationRequested)
             {
                 var data = await _queueService.Dequeue();
-                await _walletService.UpdateWallet(data.WalletId, data.Amount, data.ActionId);
-                await _walletService.TransferWallet(data.SourceId, data.WalletId, data.Amount, data.DestinationId, data.DestinationWalletID, data.ActionId);
+                switch (data.ActionId)
+                {
+                    case 1:
+                    case 4:
+
+                        await _walletService.UpdateWallet(data.WalletId, data.Amount, data.ActionId);
+
+                        break;
+                    default:
+                        await _walletService.TransferWallet(data.SourceId, data.WalletId, data.Amount, data.DestinationId, data.DestinationWalletID, data.ActionId);
+                        break;
+                }
+
             }
 
         }
