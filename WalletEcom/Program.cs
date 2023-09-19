@@ -14,12 +14,17 @@ services.AddSwaggerGen();
 builder.Services.AddDbContext<AppDbContext>(options => options.UseMySQL(builder.Configuration.GetConnectionString("MySql")));
 services.AddSingleton<IDbContextFactory<AppDbContext>, AppDbContextFactory>();
 services.AddHostedService<WalletQueueHandler>();
+services.AddHostedService<AccountQueueHandler>();
+services.AddSingleton<IAccountQueueService>(sp =>
+{
+    return new InMemoryAccountQueueService(128);
+});
 services.AddSingleton<IWalletQueueService>(sp =>
 {
     return new InMemoryWalletQueueService(128);
 });
 services.AddSingleton<IWalletService, WalletService>();
-services.AddScoped<IAccountService, AccountService>();
+services.AddSingleton<IAccountService, AccountService>();
 
 
 var app = builder.Build();

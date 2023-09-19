@@ -3,7 +3,7 @@ using WalletEcom.Services.DTOs.WalletEcom.Services.DTOs;
 
 namespace WalletEcom.Services.Impls
 {
-    public class InMemoryAccountQueueService
+    public class InMemoryAccountQueueService : IAccountQueueService
     {
         private readonly Channel<AccountDTO> _queue;
 
