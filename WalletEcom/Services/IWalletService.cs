@@ -7,12 +7,12 @@ namespace WalletEcom.Services
     public interface IWalletService
     {
         Task<Wallet> CreateWallet(WalletDTO walletDto);
-        Task<string> TransferWallet(WalletTransferRequest tranferRequest);
+        Task<string> TransferWallet(int id, int walletId, WalletTransferRequest tranferRequest);
 
         Task<List<Wallet>> GetAllWallet(string id);
 
-        Task<Wallet> UpdateWallet(string id, decimal newWallet);
+        Task<Wallet> UpdateWallet(int id, int walletId, decimal amount, int actionTypeId);
 
-        Task<Wallet> WithdrawMoney(string id, decimal newMoney);
+
     }
 }

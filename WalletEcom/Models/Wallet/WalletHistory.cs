@@ -26,9 +26,13 @@ namespace WalletEcom.Models.Wallet
 
         public DateTime CreatedAt { get; set; }
 
-        private WalletHistory() { }
-    
-        public static WalletHistory CreateForSender(int walletId, int receiverWalletId, decimal fee, int accountTypeId, int actionTypeId, decimal amount) {
+        private WalletHistory()
+        {
+            CreatedAt = DateTime.Now;
+        }
+
+        public static WalletHistory CreateForSender(int walletId, int receiverWalletId, decimal fee, int accountTypeId, int actionTypeId, decimal amount)
+        {
 
             return new WalletHistory
             {
@@ -38,7 +42,6 @@ namespace WalletEcom.Models.Wallet
                 ActionTypeId = actionTypeId,
                 Amount = amount,
                 WalletId = walletId,
-                CreatedAt = DateTime.Now,
             };
         }
         public static WalletHistory CreateForReceiver(int walletId, int senderWalletId, decimal fee, int accountTypeId, int actionTypeId, decimal amount)
@@ -51,7 +54,20 @@ namespace WalletEcom.Models.Wallet
                 ActionTypeId = actionTypeId,
                 Amount = amount,
                 WalletId = walletId,
-                CreatedAt = DateTime.Now,
+
+            };
+        }
+        public static WalletHistory CreateForAddMoney(int walletId, int senderWalletId, decimal fee, int accountTypeId, int actionTypeId, decimal amount)
+        {
+            return new WalletHistory
+            {
+                SourceWalletId = senderWalletId,
+                Fee = fee,
+                AccountTypeId = accountTypeId,
+                ActionTypeId = actionTypeId,
+                Amount = amount,
+                WalletId = walletId,
+
             };
         }
     }
