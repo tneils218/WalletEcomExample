@@ -7,28 +7,37 @@ namespace WalletEcom.Services.Impls
 {
     public class AccountService : IAccountService
     {
-        private readonly AppDbContext _db;
+        private readonly IDbContextFactory<AppDbContext> dbContextContextFactory;
+        private readonly ILogger<AccountService> _logger;
 
-        public AccountService(AppDbContext db)
+        public AccountService(IDbContextFactory<AppDbContext> dbContextFactory, ILogger<AccountService> logger)
         {
-            _db = db;
+            dbContextContextFactory = dbContextFactory;
+            _logger = logger;
         }
 
         public async Task<Account> CreateAccount(AccountDTO accountDTO)
         {
-            var account = new Account(accountDTO.UserName, accountDTO.FullName, accountDTO.Email, accountDTO.DOB, accountDTO.AccountTypeId);
+            using (var dbContext = dbContextContextFactory.CreateDbContext())
+            {
+                var account = new Account(accountDTO.UserName, accountDTO.FullName, accountDTO.Email, accountDTO.DOB, accountDTO.AccountTypeId);
 
-            _db.AccountDb.Add(account);
-            await _db.SaveChangesAsync();
-            return account;
+                dbContext.AccountDb.Add(account);
+                await dbContext.SaveChangesAsync();
+                return account;
+            }
         }
 
 
 
         public async Task<List<Account>> GetAccounts()
         {
-            var accounts = await _db.AccountDb.Include(a => a.AccountType).ToListAsync();
-            return accounts;
+            using (var dbContext = dbContextContextFactory.CreateDbContext())
+            {
+                var accounts = await dbContext.AccountDb.Include(a => a.AccountType).ToListAsync();
+                return accounts;
+            }
+
         }
     }
 }
