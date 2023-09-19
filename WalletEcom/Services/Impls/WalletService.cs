@@ -35,12 +35,12 @@ namespace WalletEcom.Services.Impls
             var wallets = await query.ToListAsync();
             return wallets;
         }
-        public async Task<string> TransferWallet(WalletTransferRequest transferRequest)
+        public async Task<string> TransferWallet(int id, int walletId, WalletTransferRequest transferRequest)
         {
             using var transaction = await _db.Database.BeginTransactionAsync();
 
             var sender = await _db.WalletDb.Include(o => o.Account)
-                .FirstOrDefaultAsync(o => o.AccountId == transferRequest.senderId && o.Id == transferRequest.senderWalletId);
+                .FirstOrDefaultAsync(o => o.AccountId == id && o.Id == walletId);
 
             var receiver = await _db.WalletDb.Include(o => o.Account)
                 .FirstOrDefaultAsync(o => o.AccountId == transferRequest.receiverId && o.Id == transferRequest.receiverWalletId);
@@ -63,7 +63,7 @@ namespace WalletEcom.Services.Impls
                 throw new InvalidOperationException("Insufficient balance in the sender's wallet.");
             }
 
-            if (transferRequest.senderWalletId == transferRequest.receiverWalletId && transferRequest.senderId == transferRequest.receiverId)
+            if (walletId == transferRequest.receiverWalletId && id == transferRequest.receiverId)
             {
                 throw new InvalidOperationException("Không thể chuyển cùng ví");
             }
@@ -73,7 +73,7 @@ namespace WalletEcom.Services.Impls
                 sender.Amount -= transferRequest.amount + transferFee.Fee;
                 receiver.Amount += transferRequest.amount;
 
-                var walletTransferHistory = WalletHistory.CreateForSender(sender.Id, receiver.Id, transferFee.Fee, sender.Account.AccountTypeId, 2, transferRequest.amount);
+                var walletTransferHistory = WalletHistory.CreateForSender(sender.Id, receiver.Id, transferFee.Fee, sender.Account.AccountTypeId, transferRequest.actionTypeId, transferRequest.amount);
 
                 _db.WalletHistoryDb.Add(walletTransferHistory);
 
@@ -92,22 +92,23 @@ namespace WalletEcom.Services.Impls
 
 
 
-        public async Task<Wallet> UpdateWallet(string id, decimal newAmount)
+        public async Task<Wallet> UpdateWallet(int id, int walletId, decimal amount, int actionTypeId)
         {
             try
             {
-                if (!int.TryParse(id, out int walletId))
-                {
-                    throw new ArgumentException("Invalid wallet ID format.");
-                }
-
-                var wallet = await _db.WalletDb.FirstOrDefaultAsync(o => o.AccountId == walletId);
+                var wallet = await _db.WalletDb.FirstOrDefaultAsync(o => o.AccountId == id);
 
                 if (wallet != null)
                 {
-
-                    wallet.Amount += newAmount;
-
+                    switch (actionTypeId)
+                    {
+                        case 1:
+                            wallet.Amount += amount;
+                            break;
+                        default:
+                            wallet.Amount -= amount;
+                            break;
+                    }
 
                     await _db.SaveChangesAsync();
 
@@ -122,11 +123,7 @@ namespace WalletEcom.Services.Impls
             {
                 throw new Exception("Error updating wallet.", ex); // Custom exception for other errors
             }
-        }
 
-        public Task<Wallet> WithdrawMoney(string id, decimal newMoney)
-        {
-            throw new NotImplementedException();
         }
     }
 }

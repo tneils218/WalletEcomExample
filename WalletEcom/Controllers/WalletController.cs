@@ -40,41 +40,42 @@ namespace WalletEcom.Controllers
             }
 
         }
-        [HttpPost]
-        [Route("tranfer")]
-        public async Task<IActionResult> TransferWallet(WalletTransferRequest request)
-        {
-            if (!ModelState.IsValid) return ValidationProblem(ModelState);
-            try
-            {
-
-                var wallets = await _walletService.TransferWallet(request);
-                return Ok(wallets);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-
-            }
-
-        }
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateAmount(string id, [FromBody] WalletAmountRequest request)
+        [Route("tranfer")]
+        public async Task<IActionResult> TransferWallet(int id, int walletId, WalletTransferRequest request)
         {
-            if (!ModelState.IsValid) return ValidationProblem(ModelState);
+            if (!ModelState.IsValid)
+                return ValidationProblem(ModelState);
 
             try
             {
 
-                var wallets = await _walletService.UpdateWallet(id, request.amount);
-                return Ok(wallets);
+                switch (request.actionTypeId)
+                {
+                    case 1:
+                        var wallets = await _walletService.UpdateWallet(id, walletId, request.amount, request.actionTypeId);
+                        return Ok(wallets);
+                    case 2:
+
+                        var transferResult = await _walletService.TransferWallet(id, walletId, request);
+                        return Ok(transferResult);
+
+                    //case 3:
+                    //    var receiveResult = await _walletService.ReceiveMoney(id, walletId, request.receiverId, request.receiverWalletId, request.amount);
+                    //    return Ok(receiveResult);
+                    case 4:
+                        var withdrawResult = await _walletService.UpdateWallet(id, walletId, request.amount, request.actionTypeId);
+                        return Ok(withdrawResult);
+                    default:
+                        return BadRequest("Invalid actionTypeId.");
+                }
             }
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
-
             }
-
         }
+
+
     }
 }
