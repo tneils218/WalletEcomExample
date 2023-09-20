@@ -6,10 +6,10 @@ namespace WalletEcom.Models.Action
     {
         public int Id { get; set; }
 
-        public int ActionTypeId { get; set; }
-        
         public int AccountTypeId { get; set; }
-        
+
+        public int ActionTypeId { get; set; }
+
         public AccountType? AccountType { get; set; }
 
         public ActionType? ActionType { get; set; }
