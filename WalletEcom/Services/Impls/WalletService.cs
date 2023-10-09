@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using WalletEcom.Controllers.Request;
 using WalletEcom.DB;
 using WalletEcom.Models.Wallet;
 using WalletEcom.Services.DTOs;
@@ -8,122 +7,139 @@ namespace WalletEcom.Services.Impls
 {
     public class WalletService : IWalletService
     {
-        private readonly AppDbContext _db;
+        private readonly IDbContextFactory<AppDbContext> dbContextContextFactory;
+        private readonly ILogger<WalletService> _logger;
 
-        public WalletService(AppDbContext db)
+        public WalletService(IDbContextFactory<AppDbContext> dbContextFactory, ILogger<WalletService> logger)
         {
-            _db = db;
+            dbContextContextFactory = dbContextFactory;
+            _logger = logger;
+
         }
         public async Task<Wallet> CreateWallet(WalletDTO walletDTO)
         {
+            using (var dbContext = dbContextContextFactory.CreateDbContext())
+            {
 
-            var wallet = new Wallet(walletDTO.AccountId);
+                var wallet = new Wallet(walletDTO.AccountId);
 
-            _db.WalletDb.Add(wallet);
-            await _db.SaveChangesAsync();
-            return wallet;
+                dbContext.WalletDb.Add(wallet);
+                await dbContext.SaveChangesAsync();
+                return wallet;
+            }
         }
 
         public async Task<List<Wallet>> GetAllWallet(string id)
         {
-            IQueryable<Wallet> query = _db.WalletDb.Include(o => o.Account); ;
-            if (!string.IsNullOrEmpty(id))
+            using (var dbContext = dbContextContextFactory.CreateDbContext())
             {
-                query = query.Where(o => o.AccountId == int.Parse(id));
-            }
-
-            var wallets = await query.ToListAsync();
-            return wallets;
-        }
-        public async Task<string> TransferWallet(int id, int walletId, WalletTransferRequest transferRequest)
-        {
-            using var transaction = await _db.Database.BeginTransactionAsync();
-
-            var sender = await _db.WalletDb.Include(o => o.Account)
-                .FirstOrDefaultAsync(o => o.AccountId == id && o.Id == walletId);
-
-            var receiver = await _db.WalletDb.Include(o => o.Account)
-                .FirstOrDefaultAsync(o => o.AccountId == transferRequest.receiverId && o.Id == transferRequest.receiverWalletId);
-
-            if (sender == null || receiver == null)
-            {
-                throw new ArgumentException("Invalid sender or receiver wallet ID.");
-            }
-
-            var transferFee = await _db.ActionFeeDb
-                .FirstOrDefaultAsync(o => o.AccountTypeId == sender.Account.AccountTypeId && o.ActionTypeId == 2);
-
-            if (transferFee == null)
-            {
-                throw new InvalidOperationException("Transfer fee not available for the given account type.");
-            }
-
-            if (sender.Amount < transferRequest.amount)
-            {
-                throw new InvalidOperationException("Insufficient balance in the sender's wallet.");
-            }
-
-            if (walletId == transferRequest.receiverWalletId && id == transferRequest.receiverId)
-            {
-                throw new InvalidOperationException("Không thể chuyển cùng ví");
-            }
-
-            try
-            {
-                sender.Amount -= transferRequest.amount + transferFee.Fee;
-                receiver.Amount += transferRequest.amount;
-
-                var walletTransferHistory = WalletHistory.CreateForSender(sender.Id, receiver.Id, transferFee.Fee, sender.Account.AccountTypeId, transferRequest.actionTypeId, transferRequest.amount);
-
-                _db.WalletHistoryDb.Add(walletTransferHistory);
-
-                await _db.SaveChangesAsync();
-                await transaction.CommitAsync();
-
-                return "Chuyển khoản thành công";
-            }
-            catch (Exception ex)
-            {
-                await transaction.RollbackAsync();
-                Console.WriteLine("Inner Exception: " + ex.InnerException?.Message);
-                throw;
-            }
-        }
-
-
-
-        public async Task<Wallet> UpdateWallet(int id, int walletId, decimal amount, int actionTypeId)
-        {
-            try
-            {
-                var wallet = await _db.WalletDb.FirstOrDefaultAsync(o => o.AccountId == id);
-
-                if (wallet != null)
+                IQueryable<Wallet> query = dbContext.WalletDb.Include(o => o.Account); ;
+                if (!string.IsNullOrEmpty(id))
                 {
-                    switch (actionTypeId)
+                    query = query.Where(o => o.AccountId == int.Parse(id));
+                }
+
+                var wallets = await query.ToListAsync();
+                return wallets;
+            }
+        }
+        public async Task<string> TransferWallet(int sourceId, int walletId, decimal amount, int destinationId, int destinationWalletId, int actionTypeId)
+        {
+            using (var dbContext = dbContextContextFactory.CreateDbContext())
+            {
+                if (walletId == destinationWalletId && sourceId == destinationId)
+                {
+                    throw new InvalidOperationException("Không thể chuyển cùng ví");
+                }
+
+                using var transaction = await dbContext.Database.BeginTransactionAsync();
+
+                var sender = await dbContext.WalletDb.Include(o => o.Account)
+                    .FirstOrDefaultAsync(o => o.AccountId == sourceId && o.Id == walletId);
+
+                var receiver = await dbContext.WalletDb.Include(o => o.Account)
+                    .FirstOrDefaultAsync(o => o.AccountId == destinationId && o.Id == destinationWalletId);
+
+                if (sender == null || receiver == null)
+                {
+                    throw new ArgumentException("Invalid sender or receiver wallet ID.");
+                }
+
+                var transferFee = await dbContext.ActionFeeDb
+                    .FirstOrDefaultAsync(o => o.AccountTypeId == sender.Account.AccountTypeId && o.ActionTypeId == actionTypeId);
+
+                if (transferFee == null)
+                {
+                    throw new InvalidOperationException("Transfer fee not available for the given account type.");
+                }
+
+                if (sender.Amount < amount)
+                {
+                    throw new InvalidOperationException("Insufficient balance in the sender's wallet.");
+                }
+
+
+
+                try
+                {
+                    sender.Amount -= amount + transferFee.Fee;
+                    receiver.Amount += amount;
+
+                    var walletTransferHistory = WalletHistory.CreateForSender(sender.Id, receiver.Id, transferFee.Fee, sender.Account.AccountTypeId, actionTypeId, amount);
+
+                    dbContext.WalletHistoryDb.Add(walletTransferHistory);
+
+                    await dbContext.SaveChangesAsync();
+                    await transaction.CommitAsync();
+
+                    return "Chuyển khoản thành công";
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    _logger.LogError(ex.Message, ex);
+                    throw;
+                }
+            }
+        }
+
+
+
+        public async Task<Wallet> UpdateWallet(int walletId, decimal amount, int actionTypeId)
+        {
+
+            using (var dbContext = dbContextContextFactory.CreateDbContext())
+            {
+                try
+                {
+                    var wallet = await dbContext.WalletDb.FirstOrDefaultAsync(o => o.Id == walletId);
+
+                    if (wallet != null)
                     {
-                        case 1:
-                            wallet.Amount += amount;
-                            break;
-                        default:
-                            wallet.Amount -= amount;
-                            break;
+                        switch (actionTypeId)
+                        {
+                            case 1:
+                                wallet.Amount += amount;
+                                break;
+                            default:
+                                wallet.Amount -= amount;
+                                break;
+                        }
+
+                        await dbContext.SaveChangesAsync();
+
+                        return wallet;
                     }
-
-                    await _db.SaveChangesAsync();
-
-                    return wallet;
+                    else
+                    {
+                        throw new Exception("Wallet not found."); // Custom exception for not found case
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    throw new Exception("Wallet not found."); // Custom exception for not found case
+                    throw new Exception("Error updating wallet.", ex); // Custom exception for other errors
                 }
             }
-            catch (Exception ex)
-            {
-                throw new Exception("Error updating wallet.", ex); // Custom exception for other errors
-            }
-
         }
     }
 }

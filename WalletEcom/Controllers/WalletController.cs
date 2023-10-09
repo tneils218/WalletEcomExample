@@ -10,16 +10,18 @@ namespace WalletEcom.Controllers
     public class WalletController : ControllerBase
     {
         private readonly IWalletService _walletService;
+        private readonly IWalletQueueService _walletQueueService;
 
-        public WalletController(IWalletService walletService)
+        public WalletController(IWalletService walletService, IWalletQueueService walletQueueService)
         {
             _walletService = walletService;
+            _walletQueueService = walletQueueService;
 
         }
         [HttpGet]
         public async Task<IActionResult> getAllWallet([FromQuery] string? id = "")
         {
-            var wallelts = await _walletService.GetAllWallet(id);
+            var wallelts = await _walletService.GetAllWallet(id ?? "");
             return Ok(wallelts);
         }
 
@@ -41,7 +43,6 @@ namespace WalletEcom.Controllers
 
         }
         [HttpPut("{id}")]
-        [Route("tranfer")]
         public async Task<IActionResult> TransferWallet(int id, int walletId, WalletTransferRequest request)
         {
             if (!ModelState.IsValid)
@@ -49,33 +50,51 @@ namespace WalletEcom.Controllers
 
             try
             {
-
-                switch (request.actionTypeId)
-                {
-                    case 1:
-                        var wallets = await _walletService.UpdateWallet(id, walletId, request.amount, request.actionTypeId);
-                        return Ok(wallets);
-                    case 2:
-
-                        var transferResult = await _walletService.TransferWallet(id, walletId, request);
-                        return Ok(transferResult);
-
-                    //case 3:
-                    //    var receiveResult = await _walletService.ReceiveMoney(id, walletId, request.receiverId, request.receiverWalletId, request.amount);
-                    //    return Ok(receiveResult);
-                    case 4:
-                        var withdrawResult = await _walletService.UpdateWallet(id, walletId, request.amount, request.actionTypeId);
-                        return Ok(withdrawResult);
-                    default:
-                        return BadRequest("Invalid actionTypeId.");
-                }
+                await _walletQueueService.Queue(WalletQueueDataDTO.Create(
+                            request.actionTypeId, walletId, request.amount, id, request.receiverId, request.receiverWalletId));
+                return Ok();
             }
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
         }
+        [HttpPost]
+        [Route("add")]
+        public async Task<IActionResult> AddMoney([FromBody] WalletAddOrWithdrawMoneyRequest request)
+        {
+            if (!ModelState.IsValid)
+                return ValidationProblem(ModelState);
 
+            try
+            {
+                await _walletQueueService.Queue(WalletQueueDataDTO.CreateForAdd(
+                            request.WalletId, request.Amount, request.ActionTypeId));
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+        [HttpPost]
+        [Route("withdraw")]
+        public async Task<IActionResult> WithdrawMoney([FromBody] WalletAddOrWithdrawMoneyRequest request)
+        {
+            if (!ModelState.IsValid)
+                return ValidationProblem(ModelState);
+
+            try
+            {
+                await _walletQueueService.Queue(WalletQueueDataDTO.CreateForAdd(
+                            request.WalletId, request.Amount, request.ActionTypeId));
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
 
     }
 }

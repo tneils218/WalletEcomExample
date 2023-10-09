@@ -1,5 +1,4 @@
-﻿using WalletEcom.Controllers.Request;
-using WalletEcom.Models.Wallet;
+﻿using WalletEcom.Models.Wallet;
 using WalletEcom.Services.DTOs;
 
 namespace WalletEcom.Services
@@ -7,12 +6,11 @@ namespace WalletEcom.Services
     public interface IWalletService
     {
         Task<Wallet> CreateWallet(WalletDTO walletDto);
-        Task<string> TransferWallet(int id, int walletId, WalletTransferRequest tranferRequest);
+        Task<string> TransferWallet(int sourceId, int walletId, decimal amount, int destinationId, int destinationWalletId, int actionTypeId);
 
         Task<List<Wallet>> GetAllWallet(string id);
 
-        Task<Wallet> UpdateWallet(int id, int walletId, decimal amount, int actionTypeId);
-
+        Task<Wallet> UpdateWallet(int walletId, decimal amount, int actionTypeId);
 
     }
 }

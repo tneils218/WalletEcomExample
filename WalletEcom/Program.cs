@@ -1,4 +1,5 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using WalletEcom.BackgroundTasks;
 using WalletEcom.DB;
 using WalletEcom.Services;
 using WalletEcom.Services.Impls;
@@ -11,8 +12,19 @@ services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
 
 builder.Services.AddDbContext<AppDbContext>(options => options.UseMySQL(builder.Configuration.GetConnectionString("MySql")));
-services.AddScoped<IAccountService, AccountService>();
-services.AddScoped<IWalletService, WalletService>();
+services.AddSingleton<IDbContextFactory<AppDbContext>, AppDbContextFactory>();
+services.AddHostedService<WalletQueueHandler>();
+services.AddHostedService<AccountQueueHandler>();
+services.AddSingleton<IAccountQueueService>(sp =>
+{
+    return new InMemoryAccountQueueService(128);
+});
+services.AddSingleton<IWalletQueueService>(sp =>
+{
+    return new InMemoryWalletQueueService(128);
+});
+services.AddSingleton<IWalletService, WalletService>();
+services.AddSingleton<IAccountService, AccountService>();
 
 
 var app = builder.Build();

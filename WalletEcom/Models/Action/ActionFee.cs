@@ -15,6 +15,7 @@ namespace WalletEcom.Models.Action
         public ActionType? ActionType { get; set; }
 
         public decimal Fee { get; set; }
+
         public ActionFee(int id, int accountTypeId, int actionTypeId, decimal fee)
         {
             Id = id;
@@ -23,5 +24,4 @@ namespace WalletEcom.Models.Action
             Fee = fee;
         }
     }
-
 }
